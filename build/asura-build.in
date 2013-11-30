@@ -1,0 +1,63 @@
+### Known issues (from arch wiki)
+## Troubleshooting boot problems
+# If you are using an Intel video chipset and the screen goes blank 
+# during the boot process, the problem is likely an issue with Kernel
+# Mode Setting. A possible workaround may be achieved by rebooting 
+# and pressing e over the entry that you are trying to boot (i686 or 
+# x86_64). At the end of the string type nomodeset and press Enter. 
+# Alternatively, try 'video=SVIDEO-1:d' which, if it works, will not 
+# disable kernel mode setting. You can also try 'i915.modeset=0'.
+## 
+
+# globals
+errnum=
+random="date +%N | sed -e 's/000$//' -e 's/^0//'"
+
+# config and defaults
+PACKAGES=""
+arch=""
+key_layout="us"
+def_font="Lat2-Terminus16"
+localegen="/locale-gen.patch"
+
+error_sig ()
+{
+	echo "asura error:$errnum"
+	echo -n "Description: "
+	case $errnum in
+		1) echo "";;
+		2) echo "";;
+		3) echo "";;
+	esac
+	echo "Check 'troubleshooting' in 'doc' directory"
+	echo "Check github issues: https://github.com/defm03/asura/issues"
+
+}
+
+make_logfile ()
+{
+	echo -n "ASURA BUILD ERROR LOG" >> builderror.log
+	date >> builderror.log
+	echo "=========================================" >> builderror.log
+}
+
+make_logfile
+
+## Here will go: 
+# 1. Choosing architecture
+# 2. Choosing key layout.
+# 3. Choosing localegen patch
+# For now it's not here, because I'm testing with only one set of 
+# settings at the moment.
+
+echo "Setting your key layout to '$key_layout' (...)"
+loadkeys $key_layout
+
+if [ $? -eq 0 ]
+then
+	echo "[+] Your key layout ('$key_layout') is sucessfully set."
+else
+	$errnum=1
+	echo "[!] error$errnum: command: 'loadkeys'" >> builderror.log
+	error_sig()
+fi
