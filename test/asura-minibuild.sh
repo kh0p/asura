@@ -60,7 +60,7 @@ make_logfile
 #
 echo "Setting your key layout to '$key_layout' (...)"
 loadkeys $key_layout
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
 	echo "[+] Your key layout ('$key_layout') is successfully set."
 else
 	$errnum=1
@@ -73,7 +73,7 @@ fi
 #
 echo "Setting your font to '$def_font' (...)"
 setfont $def_font
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
 	echo "[+] Your font ('$def_font') is successfully set."
 else
 	$errnum=1
@@ -86,7 +86,7 @@ fi
 #
 echo "Editting your locale.gen file with '$localegen'(...)"
 patch -p1 < /locale-gen.patch
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
 	echo "[+] Your locale.gen file is successfully edited."
 else
 	$errnum=1
@@ -96,7 +96,7 @@ fi
 
 echo "Running locale-gen command (...)"
 locale-gen
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
 	echo "[+] Locale-gen is successful."
 else
 	$errnum=1
@@ -106,7 +106,7 @@ fi
 
 echo "Exporting LANG ('$lang') (...)"
 export LANG=$lang
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
 	echo "[+] LANG is exported successfully."
 else
 	$errnum=1
@@ -118,7 +118,7 @@ fi
 #
 echo "Running ping command on www.google.com (...)"
 ping -c 5 www.google.com
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
 	echo "[!] Ping on www.google.com failed."
 	$errnum=2
 	echo "[!] error$errnum: command: 'ping'" >> builderror.log

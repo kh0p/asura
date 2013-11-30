@@ -34,7 +34,7 @@ leaders are Vemacitrin (Pāli: Vepacitti) and Rāhu.
 
 ## Description
 
-This script is borned in wrath, and its task is to redress the inner 
+This script is born in wrath, and its task is to redress the inner 
 balance and regain harmony with arch install stage. It's automation
 tool to keep all procedures organized - to prevent from repeating 
 oneself every single time.
