@@ -1,5 +1,4 @@
 # Asura
-
 Asura (Sanskrit: असुर) preside over moral and social phenomena.
 Bhargava believes that, in most of the ancient hymns, the word, asura,
 is always used as an adjective meaning "powerful" or "mighty". In the 
@@ -31,23 +30,29 @@ are unable to break the guard of the Four Great Kings. The Asuras are
 divided into many groups, and have no single ruler, but among their 
 leaders are Vemacitrin (Pāli: Vepacitti) and Rāhu.
 
+
+## Project
+![balance](http://imageshack.com/a/img28/8571/itvk.png ":From pixiv")
+I actually think about turning it into bigger project that will follow
+Tao, and will put my mindset together. I need to confront nature of 
+Linux and find my own place within it, not by force, but with natural
+process of assimilation to transcend space and time by redressing the 
+inner balance.
+
+
 ## Script for dynamic arch install
-
 ### Description
-
 This repo is born in wrath, and its task is to redress the inner 
-balance and regain harmony with arch install stage. It's automation
-tool to keep all procedures organized - to prevent from repeating 
-oneself every single time.
+balance and regain harmony from arch install stage to setting up 
+working framework. It's automation tool to keep all procedures 
+organized - to prevent from repeating oneself every single time.
+Build script is created to work with latest arch linux iso release, on 
+every architecture. For now, by default, it installs `gnome` and 
+`awesome-gnome` from official arch repositories. It'll also contain 
+few packages of recommended utilities.
 
-Build ccript is created to work with latest arch linux iso release, on 
-every architecture. For now, by default, it installs gnome and 
-awesome-gnome from official arch repositories. It'll also contain few 
-packs of recommended utilities.
 
 ### License
-
-Asura - Script for dynamic arch install
 Copyright (C) 2013 Kamil Żak (defm03/qualia) <defm03@outlook.jp>
 
 This program is free software: you can redistribute it and/or modify
@@ -62,3 +67,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#### @2013
