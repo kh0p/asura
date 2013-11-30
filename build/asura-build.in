@@ -52,12 +52,22 @@ make_logfile
 
 echo "Setting your key layout to '$key_layout' (...)"
 loadkeys $key_layout
-
 if [ $? -eq 0 ]
 then
-	echo "[+] Your key layout ('$key_layout') is sucessfully set."
+	echo "[+] Your key layout ('$key_layout') is successfully set."
 else
 	$errnum=1
 	echo "[!] error$errnum: command: 'loadkeys'" >> builderror.log
-	error_sig()
+	error_sig
+fi
+
+echo "Setting your font to '$def_font' (...)"
+setfont $def_font
+if [ $? -eq 0 ]
+then
+	echo "[+] Your font ('$def_font') is successfully set."
+else
+	$errnum=1
+	echo "[!] error$errnum: command: 'setfont'" >> builderror.log
+	error_sig
 fi
