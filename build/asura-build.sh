@@ -16,8 +16,12 @@
 ##
 
 # config: globals; defaults
+errnum= #${errnum:-0}
+success_msg= #${success_msg:-"[+]"}
+cmd_name= #${cmd_name:-"noname"}
+
 mkfstype=mkfs.ext4
-dewm=gnome xorg awesome-gnome
+dewm="gnome xorg awesome-gnome"
 key_layout=us
 def_font=Lat2-Terminus16
 
@@ -37,10 +41,12 @@ error_sig ()
 
 std_check ()
 {
-	if [[ $? -ne 0 ]]; then
+	if [[ $? -eq 1 ]]; then
+		echo $success_msg
+	else
 		$errnum=1
 		echo "[!] error$errnum: command: '$cmd_name'" >> builderror.log
-		error_sig
+		error_sig		
 	fi
 }
 
@@ -79,14 +85,17 @@ make_logfile
 partition_note
 read -p "Press any key to continue... " -n1 -s
 cfdisk; $cmd_name=cfdisk
-std_check
+$success_msg="[+] Done with giving space for $BOOT, $SWAP and $HOME"; std_check
 
-echo "Switching partition type to ext4 (...)"
-$mkfstype $BOOT; $cmd_name="mkfs.ext4/boot"; std_check
-$mkfstype $HOME; $cmd_name="mkfs.ext4/home"; std_check
+echo "Setting partition type to ext4 (...)"
+$mkfstype $BOOT; $cmd_name="mkfs.ext4/boot"
+$success_msg="[+] Successfully set $BOOT to ext4"; std_check
+$mkfstype $HOME; $cmd_name="mkfs.ext4/home"
+$success_msg="[+] Successfully set $HOME to ext4"; std_check
 
 echo "Creating and starting swap partition (...)"
-mkswap $SWAP; $cmd_name="mkswap"; std_check 
+mkswap $SWAP; $cmd_name="mkswap"
+$success_msg=""; std_check 
 swapon $SWAP; $cmd_name="swapon"; std_check
 
 echo "Mounting sda3 on home directory (...)"
@@ -108,6 +117,26 @@ arch-chroot /mnt; $cmd_name=arch-chroot; std_check
 
 ## 
 #
+echo "Setting your key layout to '$key_layout' (...)"
+loadkeys $key_layout
+if [[ $? -eq 0 ]]; then
+	echo "[+] Your key layout ('$key_layout') is successfully set."
+else
+	$cmd
+fi
+
+
+## Setting font 
+#
+echo "Setting your font to '$def_font' (...)"
+setfont $def_font
+if [[ $? -eq 0 ]]; then
+	echo "[+] Your font ('$def_font') is successfully set."
+else
+	$errnum=1
+	echo "[!] error$errnum: command: 'setfont'" >> builderror.log
+	error_sig
+fi
 
 ## Network build up
 #
