@@ -18,6 +18,12 @@ key_layout=us
 def_font=Lat2-Terminus16
 localegen=/locale-gen.patch
 lang=en_US.UTF-8
+partition=
+pkglist="$*"
+
+pacman_args=( $pkglist )
+pacman_args+=(--noconfirm)
+pacman_args+=(--cachedir="$newroot/var/cache/pacman/pkg")
 
 error_sig ()
 {
