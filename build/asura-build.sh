@@ -158,3 +158,11 @@ else
 	echo "[+] At least one response was heard from the specified host."
 	echo "[+] No problems with network connection."
 fi
+
+## unset unneeded variables
+unset BOOT; unset SWAP; unset HOME; unset key_layout
+unset HOME_DIR; unset mkfstype
+
+##
+# Second part of build - packages
+##
