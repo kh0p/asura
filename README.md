@@ -1,7 +1,6 @@
 # Asura
-## Script for dynamic arch install
 
-**Asura** (Sanskrit: असुर) preside over moral and social phenomena.
+Asura (Sanskrit: असुर) preside over moral and social phenomena.
 Bhargava believes that, in most of the ancient hymns, the word, asura,
 is always used as an adjective meaning "powerful" or "mighty". In the 
 Rigveda, two generous kings, as well as some priests, have been 
@@ -22,7 +21,7 @@ divine qualities briefly and the materialistic qualities at length. In
 summary, the Gita (16.4) says that the asuric qualities are pride, 
 arrogance, conceit, anger, harshness, and ignorance.
 
-In Buddhist cosmology: **Asura** (Tib: lha ma yin; Jpn: 阿修羅 Ashura) –
+In Buddhist cosmology: Asura (Tib: lha ma yin; Jpn: 阿修羅 Ashura) –
 The world of the Asuras is the space at the foot of Mount Sumeru, much
 of which is a deep ocean. It is not the Asuras' original home, but 
 the place they found themselves after they were hurled, drunken, from 
@@ -32,7 +31,9 @@ are unable to break the guard of the Four Great Kings. The Asuras are
 divided into many groups, and have no single ruler, but among their 
 leaders are Vemacitrin (Pāli: Vepacitti) and Rāhu.
 
-## Description
+## Script for dynamic arch install
+
+### Description
 
 This repo is born in wrath, and its task is to redress the inner 
 balance and regain harmony with arch install stage. It's automation
@@ -44,7 +45,7 @@ every architecture. For now, by default, it installs gnome and
 awesome-gnome from official arch repositories. It'll also contain few 
 packs of recommended utilities.
 
-## License
+### License
 
 Asura - Script for dynamic arch install
 Copyright (C) 2013 Kamil Żak (defm03/qualia) <defm03@outlook.jp>

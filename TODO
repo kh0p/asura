@@ -1,0 +1,6 @@
+## TODO
+1. integrate it more with arch build/install scripts
+2. create script for making livecd iso/liveusb build
+3. when livecd/usb build is ready: bootstrap script
+3. work on theme packages manager (onigiri)
+4. create cool utils to get all crypto stuff together

@@ -1,20 +1,15 @@
 ### Asura build script @2013
-#
-# Script is created to work with latest arch linux iso release [1],
-# on every architecture. For now, by default, it installs gnome 
-# and awesome-gnome from official arch repositories. It'll also 
-# contain few packs of recommended utilities.
-# 
-# [1]: https://projects.archlinux.org/users/dieter/releng.git/
-#	This is link to releng repo, not latest release, but it's worth
-#	checking, so I putted it here.
-#
-### TODO List:
-#
-# 1. integrate it more with arch build/install scripts
-# 2. create script for making livecd iso
-# 3. work on theme packages manager (onigiri)
-#
+##
+## Script is created to work with latest arch linux iso release [1],
+## on every architecture. For now, by default, it installs gnome 
+## and awesome-gnome from official arch repositories. It'll also 
+## contain few packs of recommended utilities.
+## 
+## [1]: https://projects.archlinux.org/users/dieter/releng.git/
+##	This is link to releng repo, not latest release, but it's worth
+##	checking, so I putted it here.
+###
+
 ###
 #
 # For future development of script:
@@ -22,21 +17,22 @@
 # wget "https://projects.archlinux.org/arch-install-scripts.git/plain/genfstab.in"
 # source pacstrap.in
 # source genfstab.in
-#
+###
+
 ### License:
-# Asura - Script for dynamic arch install 
-# Copyright (C) 2013 Kamil Żak (defm03/qualia) defm03@outlook.jp
-#
-# This program is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software Foundation,
-# either version 3 of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License along with this program. 
-# If not, see http://www.gnu.org/licenses/.
+## Asura - Script for dynamic arch install 
+## Copyright (C) 2013 Kamil Żak (defm03/qualia) defm03@outlook.jp
+##
+## This program is free software: you can redistribute it and/or modify it under the
+## terms of the GNU General Public License as published by the Free Software Foundation,
+## either version 3 of the License, or (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+## without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+## See the GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License along with this program. 
+## If not, see http://www.gnu.org/licenses/.
 ###
 
 # config: globals; defaults
