@@ -34,10 +34,15 @@ leaders are Vemacitrin (Pāli: Vepacitti) and Rāhu.
 
 ## Description
 
-This script is born in wrath, and its task is to redress the inner 
+This repo is born in wrath, and its task is to redress the inner 
 balance and regain harmony with arch install stage. It's automation
 tool to keep all procedures organized - to prevent from repeating 
 oneself every single time.
+
+Build ccript is created to work with latest arch linux iso release, on 
+every architecture. For now, by default, it installs gnome and 
+awesome-gnome from official arch repositories. It'll also contain few 
+packs of recommended utilities.
 
 ## License
 

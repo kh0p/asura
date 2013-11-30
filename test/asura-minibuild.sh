@@ -36,7 +36,6 @@ error_sig ()
 	esac
 	echo "Check 'troubleshooting' in 'doc' directory"
 	echo "Check github issues: https://github.com/defm03/asura/issues"
-
 }
 
 make_logfile ()
