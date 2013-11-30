@@ -25,7 +25,7 @@ dewm="gnome xorg awesome-gnome"
 key_layout=us
 lang=en_US.UTF-8
 def_font=Lat2-Terminus16
-
+zonetime=Poland
 
 error_sig ()
 {
@@ -148,6 +148,13 @@ echo "Exporting LANG ('$lang') (...)"
 export LANG=$lang; $cmd_name="export LANG"
 $success_msg="[+] LANG is exported successfully."; std_check
 
+
+## Zonetime and hwclock
+
+echo "Changing your default zonetime info (...)"
+ln -s /usr/share/zonetime/$zonetime
+hwclock --systohc --utc; $cmd_name="hwclock --systohc --utc"
+$success_msg="[+] Successfully set hwclock"; std_check
 
 
 ## Network build up
