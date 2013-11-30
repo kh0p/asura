@@ -23,7 +23,9 @@ cmd_name= #${cmd_name:-"noname"}
 mkfstype=mkfs.ext4
 dewm="gnome xorg awesome-gnome"
 key_layout=us
+lang=en_US.UTF-8
 def_font=Lat2-Terminus16
+
 
 error_sig ()
 {
@@ -76,11 +78,13 @@ make_logfile ()
 
 make_logfile
 
+
 ## Partitioning
 # using by default: 3 partitions (check 'partiton_note'), ext4,
 # cfdisk to make them and mounts them; it also turns one partition
 # into swap and runs swapon on it. 'pacstrap' and umount is done in 
 # next stages.
+
 partition_note
 read -p "Press any key to continue... " -n1 -s
 cfdisk; $cmd_name=cfdisk
@@ -93,9 +97,9 @@ $mkfstype $HOME; $cmd_name="mkfs.ext4/home"
 $success_msg="[+] Successfully set $HOME to ext4"; std_check
 
 echo "Creating and starting swap partition (...)"
-mkswap $SWAP; $cmd_name="mkswap"
+mkswap $SWAP; $cmd_name=mkswap
 $success_msg=""; std_check 
-swapon $SWAP; $cmd_name="swapon"; std_check
+swapon $SWAP; $cmd_name=swapon; std_check
 
 echo "Mounting sda3 on home directory (...)"
 mkdir $HOME_DIR; mount $HOME $HOME_DIR
@@ -103,9 +107,9 @@ $cmd_name=mount; std_check
 
 
 ## System installation
-#
+
 echo "Starting pacstrap - arch installation script (...)"
-pacstrap -i /mnt base base-devel; $cmd_name="pacstrap"; std_check
+pacstrap -i /mnt base base-devel; $cmd_name=pacstrap; std_check
 
 echo "Generating fstab file (...)"
 genfstab -U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/' >> /mnt/etc/fstab
@@ -115,7 +119,7 @@ arch-chroot /mnt; $cmd_name=arch-chroot; std_check
 
 
 ## Key layout and default font
-#
+
 echo "Setting your key layout to '$key_layout' (...)"
 loadkeys $key_layout; $cmd_name=loadkeys
 $success_msg="[+] Your key layout ('$key_layout') is successfully set."
@@ -127,8 +131,27 @@ $success_msg="[+] Your font ('$def_font') is successfully set."
 std_check
 
 
+## Editing and running locale-gen - setting up language 
+
+echo "Editing your locale.gen file with '$localegen'(...)"
+patch -p1 < /locale-gen.patch; $cmd_name="patch -p1"
+$success_msg="[+] Your locale.gen file is successfully edited."
+std_check
+
+echo "Running locale-gen command (...)"
+locale-gen; $cmd_name=locale-gen
+$success_msg="[+] Locale-gen is successful."; std_check
+
+echo LANG=$lang > /etc/locale.conf
+
+echo "Exporting LANG ('$lang') (...)"
+export LANG=$lang; $cmd_name="export LANG"
+$success_msg="[+] LANG is exported successfully."; std_check
+
+
+
 ## Network build up
-#
+
 echo "Running ping command on www.google.com (...)"
 ping -c 5 www.google.com
 if [[ $? -ne 0 ]]; then
