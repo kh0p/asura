@@ -65,7 +65,6 @@ partiton_note()
 		# I'll work on it later
 		exit 1
 	fi
-
 }
 
 make_logfile ()
@@ -115,28 +114,18 @@ $cmd_name="genfstab (-U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,rea
 arch-chroot /mnt; $cmd_name=arch-chroot; std_check
 
 
-## 
+## Key layout and default font
 #
 echo "Setting your key layout to '$key_layout' (...)"
-loadkeys $key_layout
-if [[ $? -eq 0 ]]; then
-	echo "[+] Your key layout ('$key_layout') is successfully set."
-else
-	$cmd
-fi
+loadkeys $key_layout; $cmd_name=loadkeys
+$success_msg="[+] Your key layout ('$key_layout') is successfully set."
+std_check
 
-
-## Setting font 
-#
 echo "Setting your font to '$def_font' (...)"
-setfont $def_font
-if [[ $? -eq 0 ]]; then
-	echo "[+] Your font ('$def_font') is successfully set."
-else
-	$errnum=1
-	echo "[!] error$errnum: command: 'setfont'" >> builderror.log
-	error_sig
-fi
+setfont $def_font; $cmd_name=setfont
+$success_msg="[+] Your font ('$def_font') is successfully set."
+std_check
+
 
 ## Network build up
 #
@@ -159,9 +148,11 @@ else
 	echo "[+] No problems with network connection."
 fi
 
+
 ## unset unneeded variables
 unset BOOT; unset SWAP; unset HOME; unset key_layout
 unset HOME_DIR; unset mkfstype
+
 
 ##
 # Second part of build - packages
