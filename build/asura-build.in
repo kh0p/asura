@@ -9,16 +9,15 @@
 # disable kernel mode setting. You can also try 'i915.modeset=0'.
 ## 
 
-# globals
+# config: globals and defaults
 errnum=
 random="date +%N | sed -e 's/000$//' -e 's/^0//'"
-
-# config and defaults
 PACKAGES=""
 arch=""
 key_layout="us"
 def_font="Lat2-Terminus16"
 localegen="/locale-gen.patch"
+lang=en_US.UTF-8
 
 error_sig ()
 {
@@ -46,10 +45,12 @@ make_logfile
 ## Here will go: 
 # 1. Choosing architecture
 # 2. Choosing key layout.
-# 3. Choosing localegen patch
+# 3. Choosing locale.gen patch
 # For now it's not here, because I'm testing with only one set of 
 # settings at the moment.
 
+## Loading key layout 
+#
 echo "Setting your key layout to '$key_layout' (...)"
 loadkeys $key_layout
 if [ $? -eq 0 ]
@@ -61,6 +62,8 @@ else
 	error_sig
 fi
 
+## Setting font 
+#
 echo "Setting your font to '$def_font' (...)"
 setfont $def_font
 if [ $? -eq 0 ]
@@ -69,5 +72,40 @@ then
 else
 	$errnum=1
 	echo "[!] error$errnum: command: 'setfont'" >> builderror.log
+	error_sig
+fi
+
+## Edditing and running locale-gen - setting up language 
+#
+echo "Editting your locale.gen file with '$localegen'(...)"
+patch -p1 < /locale-gen.patch
+if [ $? -eq 0 ]
+then
+	echo "[+] Your locale.gen file is successfully edited."
+else
+	$errnum=1
+	echo "[!] error$errnum: command: 'patch -p1'" >> builderror.log
+	error_sig
+fi
+
+echo "Running locale-gen command (...)"
+locale-gen
+if [ $? -eq 0 ]
+then
+	echo "[+] Locale-gen is successful."
+else
+	$errnum=1
+	echo "[!] error$errnum: command: 'locale-gen'" >> builderror.log
+	error_sig
+fi
+
+echo "Exporting LANG ('$lang') (...)"
+export LANG=$lang
+if [ $? -eq 0 ]
+then
+	echo "[+] LANG is exported successfully."
+else
+	$errnum=1
+	echo "[!] error$errnum: command: 'export LANG=$lang'" >> builderror.log
 	error_sig
 fi
