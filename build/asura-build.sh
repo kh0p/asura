@@ -82,7 +82,7 @@ std_check ()
 		echo $success_msg
 	else
 		$errnum=1
-		echo -e "[$l_green ! $default] error$errnum: command: '$cmd_name'" >> builderror.log
+		echo -e "[!] error$errnum: command: '$cmd_name'" >> builderror.log
 		error_sig		
 	fi
 }
@@ -170,12 +170,12 @@ arch-chroot /mnt; cmd_name=arch-chroot; std_check
 
 echo "Setting your key layout to '$key_layout' (...)"
 loadkeys $key_layout; cmd_name=loadkeys
-success_msg="[$l_green + $default] Your key layout ('$key_layout') is successfully set."
+success_msg="[+] Your key layout ('$key_layout') is successfully set."
 std_check
 
 echo "Setting your font to '$def_font' (...)"
 setfont $def_font; cmd_name=setfont
-success_msg="[$l_green + $default] Your font ('$def_font') is successfully set."
+success_msg="[+] Your font ('$def_font') is successfully set."
 std_check
 
 
@@ -183,18 +183,18 @@ std_check
 
 echo "Editing your locale.gen file with '$localegen'(...)"
 patch -p1 < /locale-gen.patch; cmd_name="patch -p1"
-success_msg="[$l_green + $default] Your locale.gen file is successfully edited."
+success_msg="[+] Your locale.gen file is successfully edited."
 std_check
 
 echo "Running locale-gen command (...)"
 locale-gen; cmd_name=locale-gen
-success_msg="[$l_green + $default] Locale-gen is successful."; std_check
+success_msg="[+] Locale-gen is successful."; std_check
 
 echo LANG=$lang > /etc/locale.conf
 
 echo "Exporting LANG ('$lang') (...)"
 export LANG=$lang; cmd_name="export LANG"
-success_msg="[$l_green + $default] LANG is exported successfully."; std_check
+success_msg="[+] LANG is exported successfully."; std_check
 
 
 ## Zonetime and hwclock
@@ -202,7 +202,7 @@ success_msg="[$l_green + $default] LANG is exported successfully."; std_check
 echo "Changing your default zonetime info (...)"
 ln -s /usr/share/zonetime/$zonetime /etc/localetime
 hwclock --systohc --utc; cmd_name="hwclock --systohc --utc"
-success_msg="[$l_green + $default] Successfully set hwclock"; std_check
+success_msg="[+] Successfully set hwclock"; std_check
 
 
 ## Network build up
@@ -210,29 +210,27 @@ success_msg="[$l_green + $default] Successfully set hwclock"; std_check
 echo "Running ping command on www.google.com (...)"
 ping -c 5 www.google.com
 if [ $? -ne 0 ]; then
-	echo -e "[$l_red ! $default] Ping on www.google.com failed."
+	echo -e "[!] Ping on www.google.com failed."
 	errnum=2
-	echo -e "[$l_red ! $default] error$errnum: command: 'ping'" >> builderror.log
+	echo -e "[!] error$errnum: command: 'ping'" >> builderror.log
 	error_sig
 
 	echo "Re-sending ping on www.google.com (...)"
 	ping -c 5 www.google.com
 	case $? in
-		1) echo -e "[$l_red ! $default] PING: exit_status:1 " >> builderreor.log; $errnum=3; error_sig;;
-		2) echo -e "[$l_red ! $default] PING: exit status:2 " >> builderreor.log; $errnum=3; error_sig;;
+		1) echo -e "[!] PING: exit_status:1 " >> builderreor.log; $errnum=3; error_sig;;
+		2) echo -e "[!] PING: exit status:2 " >> builderreor.log; $errnum=3; error_sig;;
 	esac
 else
-	echo -e "[$l_green + $default] At least one response was heard from the specified host."
-	echo -e "[$l_green + $default] No problems with network connection."
+	echo -e "[+] At least one response was heard from the specified host."
+	echo -e "[+] No problems with network connection."
 fi
 
 
 ## unset unneeded variables
 unset key_layout; unset mkfstype
 ##
-##
 # Second part of build
-##
 ##
 
 
@@ -242,6 +240,7 @@ unset key_layout; unset mkfstype
 # mkinitcpio -g /boot/linux.img -k <version>
 # https://wiki.archlinux.org/index.php/mkinitcpio - archwiki
 
+echo "Building an initramfs CPIO image (...)"
 mkinitcpio $initramfs; cmd_name=mkinitcpio
 success_msg="[+] Successful build of an initramfs CPIO image"; std_check
 
