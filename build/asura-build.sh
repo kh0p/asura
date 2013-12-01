@@ -49,6 +49,10 @@ HOSTNAME="test"
 autofdisk=yes
 RAMdisk="mkinitcpio -p linux"
 
+BOOT_SIZE=+64M
+SWAP_SIZE=+1024M
+HOME_SIZE= #rest
+
 format_color ()
 {
 	table=$(for i in {16..21} {21..16} ; do echo -en "\e[38;5;${i}m#\e[0m" ; done ; echo)
@@ -93,7 +97,7 @@ partition_note ()
 	if [ "$yesno" == 'y' ]; then
 		BOOT=/dev/sda1
 		SWAP=/dev/sda2
-		HOME=/dev/sda3
+		HOMEp=/dev/sda3
 	else
 		# I'll work on it later
 		exit 1
@@ -119,8 +123,13 @@ make_logfile
 partition_note
 read -p "Press any key to continue... " -n1 -s
 if [ "$autofdisk" == "yes" ];then
+	(echo n; echo p; echo 1; echo -ne '\n'; echo $BOOT_SIZE; \
+	 echo n; echo p; echo 2; echo -ne '\n'; echo $SWAP_SIZE; \
+	 echo n; echo p; echo 3; echo -ne '\n'; echo -ne '\n') | fdisk /dev/sda
+	cmd_name=fdisk; success_msg="[$l_green + $default] Done with allocating space for $BOOT, $SWAP and $HOMEp"; std_check
+
 	sfdisk -d /dev/sda > disk.layout; cmd_name=sfdisk
-	success_msg="[$l_green + $default] Done with giving space for $BOOT, $SWAP and $HOME"; std_check
+	success_msg="[$l_green + $default] Done with saving your disk partitions table"
 	echo "Displaying your partition layout (...)"
 	cat disk.layouts
 else
@@ -130,8 +139,8 @@ fi
 echo "Setting partition type to ext4 (...)"
 $mkfstype $BOOT; cmd_name="mkfs.ext4/boot"
 success_msg="[+] Successfully set $BOOT to ext4"; std_check
-$mkfstype $HOME; cmd_name="mkfs.ext4/home"
-success_msg="[+] Successfully set $HOME to ext4"; std_check
+$mkfstype $HOMEp; cmd_name="mkfs.ext4/home"
+success_msg="[+] Successfully set $HOMEp to ext4"; std_check
 
 echo "Creating and starting swap partition (...)"
 mkswap $SWAP; cmd_name=mkswap
@@ -139,7 +148,7 @@ success_msg=""; std_check
 swapon $SWAP; cmd_name=swapon; std_check
 
 echo "Mounting sda3 on home directory (...)"
-mkdir $HOME_DIR; mount $HOME $HOME_DIR
+mkdir $HOME_DIR; mount $HOMEp $HOME_DIR
 cmd_name=mount; std_check
 
 
