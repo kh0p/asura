@@ -5,6 +5,9 @@
 ## on every architecture. For now, by default, it installs gnome 
 ## and awesome-gnome from official arch repositories. It'll also 
 ## contain few packs of recommended utilities.
+##
+## I've implemented few functions from AUI script:
+## 	https://github.com/helmuthdu/aui/blob/master/sharedfuncs
 ## 
 ## [1]: https://projects.archlinux.org/users/dieter/releng.git/
 ##	This is link to releng repo, not latest release, but it's worth
@@ -111,7 +114,11 @@ partition_note ()
 partition_mount ()
 {
 	echo "Mounting sda3 on home directory (...)"
+	
 	mkdir $HOME_DIR; mount $HOMEp $HOME_DIR
+	cmd_name=mount; std_check
+	
+	mkdir $MOUNTPOINT/swapf; mount $SWAP $MOUNTPOINT/swapf 
 	cmd_name=mount; std_check
 }
 
@@ -156,6 +163,8 @@ make_logfile
 partition_note
 read -p "Press any key to continue... " -n1 -s
 if [ "$autofdisk" == "yes" ];then
+	TOTAL_MEM=`grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//'`
+
 	(echo n; echo p; echo 1; echo ; echo $BOOT_SIZE;
 	 echo a;
 	 echo n; echo p; echo 2; echo ; echo $SWAP_SIZE;
@@ -177,8 +186,6 @@ if [ "$autofdisk" == "yes" ];then
 	echo "Creating and starting swap partition (...)"
 	mkswap $SWAP; cmd_name=mkswap; std_check 
 	swapon $SWAP; cmd_name=swapon; std_check
-
-
 else
 	echo "Running 'cfdisk' - tool to set up your partitions (...)"
 	cfdisk; cmd_name=mount; std_check
@@ -187,24 +194,78 @@ fi
 
 ## Network tests
 
-echo "Running ping command on www.google.com (...)"
-ping -c 5 www.google.com
-if [ $? -ne 0 ]; then
-	echo -e "[!] Ping on www.google.com failed."
-	errnum=2
-	echo -e "[!] error$errnum: command: 'ping'" >> builderror.log
-	error_sig
-
-	echo "Re-sending ping on www.google.com (...)"
+network_test ()
+{
+	echo "Running ping command on www.google.com (...)"
 	ping -c 5 www.google.com
-	case $? in
-		1) echo -e "[!] PING: exit_status:1 " >> builderreor.log; $errnum=3; error_sig;;
-		2) echo -e "[!] PING: exit status:2 " >> builderreor.log; $errnum=3; error_sig;;
-	esac
-else
-	echo -e "[+] At least one response was heard from the specified host."
-	echo -e "[+] No problems with network connection."
-fi
+	if [ $? -ne 0 ]; then
+		echo -e "[!] Ping on www.google.com failed."
+		errnum=2
+		echo -e "[!] error$errnum: command: 'ping'" >> builderror.log
+		error_sig
+
+		echo "Re-sending ping on www.google.com (...)"
+		ping -c 5 www.google.com
+		case $? in
+			1) echo -e "[!] PING: exit_status:1 " >> builderreor.log; $errnum=3; error_sig;;
+			2) echo -e "[!] PING: exit status:2 " >> builderreor.log; $errnum=3; error_sig;;
+		esac
+	else
+		echo -e "[+] At least one response was heard from the specified host."
+		echo -e "[+] No problems with network connection."
+	fi	
+}
+echo -n "Do you want to test your network now? (y/n) "; read yesno
+if [ "$yesno" == 'y' ]; then network_test fi
+
+network_test_aui ()
+{
+	XPINGS=$(( $XPINGS + 1 ))
+	ping_gw () {
+		IP_ADDR=`ip r | grep default | cut -d ' ' -f 3`
+		[[ -z $IP_ADDR ]] && IP_ADDR="8.8.8.8"
+		ping -q -w 1 -c 1 ${IP_ADDR} > /dev/null && return 1 || return 0
+	}
+	WIRED_DEV=`ip link | grep enp | awk '{print $2}'| sed 's/://'`
+	WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
+	if ping_gw; then
+		echo "ERROR! Connection not Found."
+		echo "Network setup"
+		conn_type_list=("Wired Automatic" "Wired Manual" "Wireless")
+		select CONNECTION_TYPE in "${conn_type_list[@]}"; do
+			case "$REPLY" in
+				1)
+					systemctl start dhcpcd@${WIRED_DEV}.service
+					break
+					;;
+				2)
+					systemctl stop dhcpcd@${WIRED_DEV}.service
+					read -p "IP Address: " IP_ADDR
+					read -p "Submask: " SUBMASK
+					read -p "Gateway: " GATEWAY
+					ip link set ${WIRED_DEV} up
+					ip addr add ${IP_ADDR}/${SUBMASK} dev ${WIRED_DEV}
+					ip route add default via ${GATEWAY}		
+					$EDITOR /etc/resolv.conf
+					break
+					;;
+				3)
+					ip link set ${WIRELESS_DEV} up
+					wifi-menu ${WIRELESS_DEV}
+					break
+					;;
+				*)
+					echo "Invalid option"
+					;;
+			esac
+		done
+		if [[ $XPINGS -gt 2 ]]; then
+			echo "Can't establish connection. exiting..."
+			exit 1
+		fi
+		check_connection
+	fi		
+}
 
 
 ## System installation
