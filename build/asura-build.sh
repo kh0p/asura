@@ -119,8 +119,8 @@ make_logfile
 partition_note
 read -p "Press any key to continue... " -n1 -s
 if [ "$autofdisk" == "yes" ];then
-	sfdisk -d /dev/sda > disk.layout; $cmd_name=sfdisk
-	$success_msg="[$l_green + $default] Done with giving space for $BOOT, $SWAP and $HOME"; std_check
+	sfdisk -d /dev/sda > disk.layout; cmd_name=sfdisk
+	success_msg="[$l_green + $default] Done with giving space for $BOOT, $SWAP and $HOME"; std_check
 	echo "Displaying your partition layout (...)"
 	cat disk.layouts
 else
@@ -128,70 +128,70 @@ else
 fi
 
 echo "Setting partition type to ext4 (...)"
-$mkfstype $BOOT; $cmd_name="mkfs.ext4/boot"
-$success_msg="[+] Successfully set $BOOT to ext4"; std_check
-$mkfstype $HOME; $cmd_name="mkfs.ext4/home"
-$success_msg="[+] Successfully set $HOME to ext4"; std_check
+$mkfstype $BOOT; cmd_name="mkfs.ext4/boot"
+success_msg="[+] Successfully set $BOOT to ext4"; std_check
+$mkfstype $HOME; cmd_name="mkfs.ext4/home"
+success_msg="[+] Successfully set $HOME to ext4"; std_check
 
 echo "Creating and starting swap partition (...)"
-mkswap $SWAP; $cmd_name=mkswap
-$success_msg=""; std_check 
-swapon $SWAP; $cmd_name=swapon; std_check
+mkswap $SWAP; cmd_name=mkswap
+success_msg=""; std_check 
+swapon $SWAP; cmd_name=swapon; std_check
 
 echo "Mounting sda3 on home directory (...)"
 mkdir $HOME_DIR; mount $HOME $HOME_DIR
-$cmd_name=mount; std_check
+cmd_name=mount; std_check
 
 
 ## System installation
 
 echo "Starting pacstrap - arch installation script (...)"
-pacstrap -i /mnt base base-devel; $cmd_name=pacstrap; std_check
+pacstrap -i /mnt base base-devel; cmd_name=pacstrap; std_check
 
 echo "Generating fstab file (...)"
 genfstab -U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/' >> /mnt/etc/fstab
-$cmd_name="genfstab (-U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/')"; std_check
+cmd_name="genfstab (-U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/')"; std_check
 
-arch-chroot /mnt; $cmd_name=arch-chroot; std_check
+arch-chroot /mnt; cmd_name=arch-chroot; std_check
 
 
 ## Key layout and default font
 
 echo "Setting your key layout to '$key_layout' (...)"
-loadkeys $key_layout; $cmd_name=loadkeys
-$success_msg="[$l_green + $default] Your key layout ('$key_layout') is successfully set."
+loadkeys $key_layout; cmd_name=loadkeys
+success_msg="[$l_green + $default] Your key layout ('$key_layout') is successfully set."
 std_check
 
 echo "Setting your font to '$def_font' (...)"
-setfont $def_font; $cmd_name=setfont
-$success_msg="[$l_green + $default] Your font ('$def_font') is successfully set."
+setfont $def_font; cmd_name=setfont
+success_msg="[$l_green + $default] Your font ('$def_font') is successfully set."
 std_check
 
 
 ## Editing and running locale-gen - setting up language 
 
 echo "Editing your locale.gen file with '$localegen'(...)"
-patch -p1 < /locale-gen.patch; $cmd_name="patch -p1"
-$success_msg="[$l_green + $default] Your locale.gen file is successfully edited."
+patch -p1 < /locale-gen.patch; cmd_name="patch -p1"
+success_msg="[$l_green + $default] Your locale.gen file is successfully edited."
 std_check
 
 echo "Running locale-gen command (...)"
-locale-gen; $cmd_name=locale-gen
-$success_msg="[$l_green + $default] Locale-gen is successful."; std_check
+locale-gen; cmd_name=locale-gen
+success_msg="[$l_green + $default] Locale-gen is successful."; std_check
 
 echo LANG=$lang > /etc/locale.conf
 
 echo "Exporting LANG ('$lang') (...)"
-export LANG=$lang; $cmd_name="export LANG"
-$success_msg="[$l_green + $default] LANG is exported successfully."; std_check
+export LANG=$lang; cmd_name="export LANG"
+success_msg="[$l_green + $default] LANG is exported successfully."; std_check
 
 
 ## Zonetime and hwclock
 
 echo "Changing your default zonetime info (...)"
 ln -s /usr/share/zonetime/$zonetime /etc/localetime
-hwclock --systohc --utc; $cmd_name="hwclock --systohc --utc"
-$success_msg="[$l_green + $default] Successfully set hwclock"; std_check
+hwclock --systohc --utc; cmd_name="hwclock --systohc --utc"
+success_msg="[$l_green + $default] Successfully set hwclock"; std_check
 
 
 ## Network build up
@@ -200,7 +200,7 @@ echo "Running ping command on www.google.com (...)"
 ping -c 5 www.google.com
 if [ $? -ne 0 ]; then
 	echo -e "[$l_red ! $default] Ping on www.google.com failed."
-	$errnum=2
+	errnum=2
 	echo -e "[$l_red ! $default] error$errnum: command: 'ping'" >> builderror.log
 	error_sig
 
