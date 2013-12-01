@@ -47,7 +47,7 @@ def_font=Lat2-Terminus16
 zonetime=Poland
 HOSTNAME="test"
 autofdisk=yes
-RAMdisk="mkinitcpio -p linux"
+initramfs="-p linux"
 
 BOOT_SIZE=+64M
 SWAP_SIZE=+1024M
@@ -108,7 +108,7 @@ make_logfile ()
 {
 	echo -n "ASURA BUILD ERROR LOG " >> builderror.log
 	date >> builderror.log
-	echo "=========================================" >> builderror.log
+	echo "==================================================" >> builderror.log
 }
 
 make_logfile
@@ -228,10 +228,23 @@ fi
 
 
 ## unset unneeded variables
-unset BOOT; unset SWAP; unset HOME; unset key_layout
-unset HOME_DIR; unset mkfstype
+unset key_layout; unset mkfstype
+##
+##
+# Second part of build
+##
+##
 
 
-##
-# Second part of build - packages
-##
+## building an initramfs CPIO image
+# mkinitcpio - is the next generation of initramfs creation. 
+# /usr/lib/modules - available kernel versions
+# mkinitcpio -g /boot/linux.img -k <version>
+# https://wiki.archlinux.org/index.php/mkinitcpio - archwiki
+
+mkinitcpio $initramfs; cmd_name=mkinitcpio
+success_msg="[+] Successful build of an initramfs CPIO image"; std_check
+
+
+## unset uneeded variables
+unset BOOT; unset SWAP; unset HOMEp; unset HOME_DIR; 
