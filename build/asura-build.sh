@@ -47,7 +47,7 @@ lang=en_US.UTF-8
 def_font=Lat2-Terminus16
 zonetime=Poland
 HOSTNAME="test"
-HOME_DIR=$MOUNTPOINT/home
+HOME_DIR=home
 autofdisk=yes
 initramfs="-p linux"
 EDITOR=nano # for test
@@ -55,6 +55,11 @@ EDITOR=nano # for test
 BOOT_SIZE=+64M
 SWAP_SIZE=+1024M
 HOME_SIZE= #rest
+
+arch_chroot() 
+{ 
+    arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
+}
 
 format_color ()
 {
@@ -110,7 +115,7 @@ partition_mount ()
 {
 	echo "Mounting sda3 on home directory (...)"
 	
-	mkdir $HOME_DIR; mount $HOMEp $HOME_DIR
+	mkdir $MOUNTPOINT/$HOME_DIR; mount $HOMEp $HOME_DIR
 	cmd_name=mount; std_check
 	
 	mkdir $MOUNTPOINT/swapf; mount $SWAP $MOUNTPOINT/swapf 
@@ -118,6 +123,11 @@ partition_mount ()
 
 	mount $BOOT $MOUNTPOINT
 	cmd_name=mount; std_check
+}
+
+partition_umount ()
+{
+	umount /mnt/{swapf,home,}
 }
 
 fstab_config ()
@@ -140,6 +150,98 @@ fstab_config ()
 	echo "Review your fstab"
 	[[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
 	$EDITOR $MOUNTPOINT/etc/fstab
+}
+
+install_bootloader(){
+	echo "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
+	echo "The boot loader is responsible for loading the kernel and 
+	initial RAM disk before initiating the boot process."
+	
+	bootloader=("Grub2" "Syslinux" "Skip")
+	echo -e "Install bootloader:\n"
+	select BOOTLOADER in "${bootloader[@]}"; do
+		case "$REPLY" in
+			1)
+				#make grub automatically detect others OS
+				if [[ $UEFI -eq 1 ]]; then
+					pacstrap $MOUNTPOINT grub efibootmgr
+				else
+					pacstrap $MOUNTPOINT grub
+				fi
+				pacstrap $MOUNTPOINT os-prober
+				break
+				;;
+			2)
+				pacstrap $MOUNTPOINT syslinux
+				break
+				;;
+			3)
+				break
+				;;
+			*)
+				invalid_option
+				;;
+		esac
+	done
+}
+
+bootloader_config ()
+{
+	case $BOOTLOADER in
+		Grub2)
+			arch_chroot "modprobe dm-mod"
+			grub_install_mode=("[MBR|UEFI] Automatic" "Manual")
+			echo -e "Grub Install:\n"
+			select OPT in "${grub_install_mode[@]}"; do
+				case "$REPLY" in
+					1)
+						if [[ $UEFI -eq 1 ]]; then
+							arch_chroot "mount -t efivarfs efivarfs /sys/firmware/efi/efivars && grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck && umount -R /sys/firmware/efi/efivars"
+						else
+							arch_chroot "grub-install --recheck ${BOOT_DEVICE}"
+						fi
+						break
+						;;
+					2)
+						arch-chroot $MOUNTPOINT
+						break
+						;;
+					*)
+						echo "Invalid option"
+						;;
+				esac
+			done
+			arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
+			;;
+		Syslinux)
+			syslinux_install_mode=("[MBR] Automatic" "[PARTITION] Automatic" "Manual")
+			echo -e "Syslinux Install:\n"
+			select OPT in "{syslinux_install_mode[@]}"; do
+				case "$REPLY" in
+					1)
+						arch_chroot "syslinux-install_update -iam"
+						;;
+					2)
+						arch_chroot "syslinux-install_update -i"
+						break
+						;;
+					3)
+						echo "Your boot partition, on which you plan to install Syslinux, must contain a FAT, 
+						ext2, ext3, ext4, or Btrfs file system. You should install it on a mounted directory, 
+						not a /dev/sdXY device. You do not have to install it on the root directory of a file 
+						system, e.g., with device /dev/sda1 mounted on /boot you can install Syslinux in the 
+						syslinux directory"
+						echo "[!] mkdir /boot/syslinux\nextlinux --install /boot/syslinux"
+						arch_chroot $MOUNTPOINT
+						break
+						;;
+					*)
+						echo "Invalid option"
+						;;
+				esac
+			done
+		;;
+	esac
 }
 
 make_logfile ()
@@ -269,38 +371,6 @@ network_test_aui ()
 	fi		
 }
 
-install_bootloader(){
-	echo "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
-	echo "The boot loader is responsible for loading the kernel and 
-	initial RAM disk before initiating the boot process."
-	bootloader=("Grub2" "Syslinux" "Skip")
-	echo -e "Install bootloader:\n"
-	select BOOTLOADER in "${bootloader[@]}"; do
-		case "$REPLY" in
-			1)
-				#make grub automatically detect others OS
-				if [[ $UEFI -eq 1 ]]; then
-					pacstrap $MOUNTPOINT grub efibootmgr
-				else
-					pacstrap $MOUNTPOINT grub
-				fi
-				pacstrap $MOUNTPOINT os-prober
-				break
-				;;
-			2)
-				pacstrap $MOUNTPOINT syslinux
-				break
-				;;
-			3)
-				break
-				;;
-			*)
-				invalid_option
-				;;
-		esac
-	done
-}
-
 
 ## System installation
 
@@ -400,6 +470,12 @@ if [ "$yesno" == 'y' ]; then
 		passwd $usrname
 	fi
 fi
+
+
+## Installation and configuration of bootloader
+
+install_bootloader
+bootloader_config
 
 
 ## unset uneeded variables
