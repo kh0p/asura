@@ -46,6 +46,7 @@ lang=en_US.UTF-8
 def_font=Lat2-Terminus16
 zonetime=Poland
 HOSTNAME="test"
+HOME_DIR=/mnt/home
 autofdisk=yes
 initramfs="-p linux"
 
