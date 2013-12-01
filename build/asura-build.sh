@@ -90,7 +90,7 @@ partition_note ()
 	echo "	sda2 = swap (moderate amount of space)"
 	echo "	sda3 = home (biggest partition)"
 	echo -n "You like that model? (y/n)"; read yesno
-	if [ yesno -eq 'y' ]; then
+	if [ yesno == 'y' ]; then
 		BOOT=/dev/sda1
 		SWAP=/dev/sda2
 		HOME=/dev/sda3
