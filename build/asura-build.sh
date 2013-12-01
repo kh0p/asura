@@ -245,5 +245,27 @@ mkinitcpio $initramfs; cmd_name=mkinitcpio
 success_msg="[+] Successful build of an initramfs CPIO image"; std_check
 
 
+## Creating user
+
+yesno=
+echo -n "Do you want to create new user? (y/n) "; read yesno
+if [ "$yesno" == 'y' ]; then
+	echo -n "Do you want to set root password? (y/n) "; read yesno
+	if [ "$yesno" == 'y' ]; then
+		passwd; cmd_name=passwd; std_check
+	else
+		echo "Continue ..."
+	fi
+	usrname=
+	echo -n "Enter your username: "; read usrname
+	useradd -m -g users -G wheel -s /bin/bash $usrname
+	cmd_name="useradd -m -g users -G wheel -s /bin/bash $usrname"; std_check
+	echo -n "You want password for your user? (y/n) "; read yesno
+	if [ "$yesno" == 'y' ]; then
+		passwd $usrname
+	fi
+fi
+
+
 ## unset uneeded variables
 unset BOOT; unset SWAP; unset HOMEp; unset HOME_DIR; 
