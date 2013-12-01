@@ -1,0 +1,4 @@
+# <file system>        <dir>         <type>    <options>             <dump> <pass>
+/dev/sda1              /             ext4      defaults,noatime      0      1
+/dev/sda2              /swapf        swap      defaults              0      0
+/dev/sda3              /home         ext4      defaults,noatime      0      2

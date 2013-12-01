@@ -116,7 +116,7 @@ partition_mount ()
 	mkdir $MOUNTPOINT/swapf; mount $SWAP $MOUNTPOINT/swapf 
 	cmd_name=mount; std_check
 
-	mkdir $MOUNTPOINT/boot; mount $BOOT $MOUNTPOINT/boot
+	mount $BOOT $MOUNTPOINT
 	cmd_name=mount; std_check
 }
 
@@ -269,7 +269,36 @@ network_test_aui ()
 	fi		
 }
 
-
+install_bootloader(){
+	print_title "BOOTLOADER - https://wiki.archlinux.org/index.php/Bootloader"
+	print_info "The boot loader is responsible for loading the kernel and initial RAM disk before initiating the boot process."
+	bootloader=("Grub2" "Syslinux" "Skip")
+	echo -e "Install bootloader:\n"
+	select BOOTLOADER in "${bootloader[@]}"; do
+	case "$REPLY" in
+      1)
+        #make grub automatically detect others OS
+        if [[ $UEFI -eq 1 ]]; then
+pacstrap $MOUNTPOINT grub efibootmgr
+        else
+pacstrap $MOUNTPOINT grub
+        fi
+pacstrap $MOUNTPOINT os-prober
+        break
+        ;;
+      2)
+        pacstrap $MOUNTPOINT syslinux
+        break
+        ;;
+      3)
+        break
+        ;;
+      *)
+        invalid_option
+        ;;
+    esac
+done
+}
 ## System installation
 
 echo "Starting pacstrap - arch installation script (...)"
