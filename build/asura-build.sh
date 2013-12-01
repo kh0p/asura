@@ -1,3 +1,4 @@
+#!/usr/local/bin/expect -f
 ### Asura build script @2013
 ##
 ## Script is created to work with latest arch linux iso release [1],
@@ -11,7 +12,6 @@
 ###
 
 ###
-#
 # For future development of script:
 # wget "https://projects.archlinux.org/arch-install-scripts.git/plain/pacstrap.in"
 # wget "https://projects.archlinux.org/arch-install-scripts.git/plain/genfstab.in"
@@ -46,6 +46,9 @@ key_layout=us
 lang=en_US.UTF-8
 def_font=Lat2-Terminus16
 zonetime=Poland
+HOSTNAME="test"
+autofdisk="yes"
+RAMdisk="mkinitcpio -p linux"
 
 error_sig ()
 {
@@ -63,7 +66,7 @@ error_sig ()
 
 std_check ()
 {
-	if [[ $? -eq 1 ]]; then
+	if [ $? -eq 1 ]; then
 		echo $success_msg
 	else
 		$errnum=1
@@ -79,7 +82,7 @@ partiton_note()
 	echo "	sda2 = swap (moderate amount of space)"
 	echo "	sda3 = home (biggest partition)"
 	echo -n "You like that model? (y/n)"; read yesno
-	if [[ yesno -eq 'y' ]]; then
+	if [ yesno -eq 'y' ]; then
 		BOOT=/dev/sda1
 		SWAP=/dev/sda2
 		HOME=/dev/sda3
@@ -107,8 +110,14 @@ make_logfile
 
 partition_note
 read -p "Press any key to continue... " -n1 -s
-cfdisk; $cmd_name=cfdisk
-$success_msg="[+] Done with giving space for $BOOT, $SWAP and $HOME"; std_check
+if [ autofdisk = "yes" ];then
+	sfdisk -d /dev/sda > disk.layout; $cmd_name=sfdisk
+	$success_msg="[+] Done with giving space for $BOOT, $SWAP and $HOME"; std_check
+	echo "Displaying your partition layout (...)"
+	cat disk.layouts
+else
+	cfdisk
+fi
 
 echo "Setting partition type to ext4 (...)"
 $mkfstype $BOOT; $cmd_name="mkfs.ext4/boot"
@@ -181,7 +190,7 @@ $success_msg="[+] Successfully set hwclock"; std_check
 
 echo "Running ping command on www.google.com (...)"
 ping -c 5 www.google.com
-if [[ $? -ne 0 ]]; then
+if [ $? -ne 0 ]; then
 	echo "[!] Ping on www.google.com failed."
 	$errnum=2
 	echo "[!] error$errnum: command: 'ping'" >> builderror.log
