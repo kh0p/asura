@@ -12,7 +12,6 @@
 ##	This is link to releng repo, not latest release, but it's worth
 ##	checking, so I putted it here.
 ###
-
 ###
 # For future development of script:
 # wget "https://projects.archlinux.org/arch-install-scripts.git/plain/pacstrap.in"
@@ -20,7 +19,6 @@
 # source pacstrap.in
 # source genfstab.in
 ###
-
 ### License:
 ## Asura - Script for dynamic arch install 
 ## Copyright (C) 2013 Kamil Żak (defm03/qualia) defm03@outlook.jp
@@ -36,7 +34,6 @@
 ## You should have received a copy of the GNU General Public License along with this program. 
 ## If not, see http://www.gnu.org/licenses/.
 ###
-
 # config: globals; defaults
 errnum= #${errnum:-0}
 success_msg= #${success_msg:-"[+]"}
