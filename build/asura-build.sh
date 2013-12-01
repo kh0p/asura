@@ -74,7 +74,7 @@ error_sig ()
 
 std_check ()
 {
-	if [ $? -eq 1 ]; then
+	if [ $? -eq 0 ]; then
 		echo $success_msg
 	else
 		$errnum=1
