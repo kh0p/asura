@@ -118,7 +118,7 @@ make_logfile
 
 partition_note
 read -p "Press any key to continue... " -n1 -s
-if [ "$autofdisk" = "yes" ];then
+if [ "$autofdisk" == "yes" ];then
 	sfdisk -d /dev/sda > disk.layout; $cmd_name=sfdisk
 	$success_msg="[$l_green + $default] Done with giving space for $BOOT, $SWAP and $HOME"; std_check
 	echo "Displaying your partition layout (...)"
