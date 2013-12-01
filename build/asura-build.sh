@@ -104,7 +104,7 @@ partition_note ()
 	if [ "$yesno" == 'y' ]; then
 		BOOT=/dev/sda1
 		SWAP=/dev/sda2
-		HOMEp=/dev/sda3
+		ROOT=/dev/sda3
 	else
 		# I'll work on it later
 		exit 1
@@ -113,15 +113,14 @@ partition_note ()
 
 partition_mount ()
 {
-	echo "Mounting sda3 on home directory (...)"
-	
-	mkdir $MOUNTPOINT/$HOME_DIR; mount $HOMEp $HOME_DIR
+	echo "Mounting sda3 on $MOUNTPOINT (...)"
+	mount $ROOT $MOUNTPOINT
 	cmd_name=mount; std_check
 	
 	mkdir $MOUNTPOINT/swapf; mount $SWAP $MOUNTPOINT/swapf 
 	cmd_name=mount; std_check
 
-	mount $BOOT $MOUNTPOINT
+	mkdir $MOUNTPOINT/boot; mount $BOOT $MOUNTPOINT/boot
 	cmd_name=mount; std_check
 }
 
@@ -270,18 +269,18 @@ if [ "$autofdisk" == "yes" ];then
 	 echo n; echo p; echo 2; echo ; echo $SWAP_SIZE;
 	 echo t; echo 2; echo 82;
 	 echo n; echo p; echo 3; echo ; echo ; echo w) | fdisk /dev/sda
-	cmd_name=fdisk; success_msg="[+] Done with allocating space for $BOOT, $SWAP and $HOMEp"; std_check
+	cmd_name=fdisk; success_msg="[+] Done with allocating space for $BOOT, $SWAP and $ROOT"; std_check
 
 	# sfdisk -d /dev/sda > disk.layout; cmd_name=sfdisk
 	# success_msg="[+] Done with saving your disk partitions table"
 	# echo "Displaying your partition layout (...)"
 	# cat disk.layouts
 
-	echo "Setting $BOOT and $HOMEp partition type to ext4 (...)"
+	echo "Setting $BOOT and $ROOT partition type to ext4 (...)"
 	$mkfstype $BOOT; cmd_name="mkfs.ext4/boot"
 	success_msg="[+] Successfully set $BOOT to ext4"; std_check
-	$mkfstype $HOMEp; cmd_name="mkfs.ext4/home"
-	success_msg="[+] Successfully set $HOMEp to ext4"; std_check
+	$mkfstype $ROOT; cmd_name="mkfs.ext4/home"
+	success_msg="[+] Successfully set $ROOT to ext4"; std_check
 
 	echo "Creating and starting swap partition (...)"
 	mkswap $SWAP; cmd_name=mkswap; std_check 
