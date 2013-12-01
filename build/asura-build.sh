@@ -1,4 +1,3 @@
-#!/usr/local/bin/expect -f
 ### Asura build script @2013
 ##
 ## Script is created to work with latest arch linux iso release [1],
