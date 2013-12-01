@@ -175,10 +175,10 @@ if [ "$autofdisk" == "yes" ];then
 	 echo n; echo p; echo 3; echo ; echo ; echo w) | fdisk /dev/sda
 	cmd_name=fdisk; success_msg="[+] Done with allocating space for $BOOT, $SWAP and $HOMEp"; std_check
 
-	sfdisk -d /dev/sda > disk.layout; cmd_name=sfdisk
-	success_msg="[+] Done with saving your disk partitions table"
-	echo "Displaying your partition layout (...)"
-	cat disk.layouts
+	# sfdisk -d /dev/sda > disk.layout; cmd_name=sfdisk
+	# success_msg="[+] Done with saving your disk partitions table"
+	# echo "Displaying your partition layout (...)"
+	# cat disk.layouts
 
 	echo "Setting $BOOT and $HOMEp partition type to ext4 (...)"
 	$mkfstype $BOOT; cmd_name="mkfs.ext4/boot"
