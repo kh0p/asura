@@ -216,7 +216,9 @@ network_test ()
 	fi	
 }
 echo -n "Do you want to test your network now? (y/n) "; read yesno
-if [ "$yesno" == 'y' ]; then network_test fi
+if [ "$yesno" == 'y' ]; then 
+	network_test 
+fi
 
 network_test_aui ()
 {
