@@ -123,8 +123,8 @@ make_logfile
 partition_note
 read -p "Press any key to continue... " -n1 -s
 if [ "$autofdisk" == "yes" ];then
-	(echo n; echo p; echo 1; echo -ne '\n'; echo $BOOT_SIZE; \
-	 echo n; echo p; echo 2; echo -ne '\n'; echo $SWAP_SIZE; \
+	(echo n; echo p; echo 1; echo -ne '\n'; echo $BOOT_SIZE 
+	 echo n; echo p; echo 2; echo -ne '\n'; echo $SWAP_SIZE
 	 echo n; echo p; echo 3; echo -ne '\n'; echo -ne '\n') | fdisk /dev/sda
 	cmd_name=fdisk; success_msg="[$l_green + $default] Done with allocating space for $BOOT, $SWAP and $HOMEp"; std_check
 
