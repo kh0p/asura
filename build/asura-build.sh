@@ -78,9 +78,9 @@ error_sig ()
 		2) echo "command returned non-zero value - checking others";;
 		3) echo "command returned non-zero value - different possibilities checked";;
 	esac
-	echo "Check '\e[92mtroubleshooting\e[39m' in '\e[92mdoc\e[39m' directory"
+	echo "Check 'troubleshooting' in 'doc' directory"
 	echo "Check github issues: https://github.com/defm03/asura/issues"
-	echo "and share your '\e[92mbuilderror.log\e[39m' file."
+	echo "and share your 'builderror.log' file."
 }
 
 std_check ()
@@ -119,6 +119,9 @@ partition_mount ()
 	cmd_name=mount; std_check
 	
 	mkdir $MOUNTPOINT/swapf; mount $SWAP $MOUNTPOINT/swapf 
+	cmd_name=mount; std_check
+
+	mkdir $MOUNTPOINT/boot; mount $BOOT $MOUNTPOINT/boot
 	cmd_name=mount; std_check
 }
 
@@ -186,6 +189,8 @@ if [ "$autofdisk" == "yes" ];then
 	echo "Creating and starting swap partition (...)"
 	mkswap $SWAP; cmd_name=mkswap; std_check 
 	swapon $SWAP; cmd_name=swapon; std_check
+
+	partition_mount
 else
 	echo "Running 'cfdisk' - tool to set up your partitions (...)"
 	cfdisk; cmd_name=mount; std_check
@@ -287,15 +292,19 @@ arch-chroot /mnt; cmd_name=arch-chroot; std_check
 
 ## Key layout and default font
 
-echo "Setting your key layout to '$key_layout' (...)"
-loadkeys $key_layout; cmd_name=loadkeys
-success_msg="[+] Your key layout ('$key_layout') is successfully set."
-std_check
+key_build () 
+{
+	echo "Setting your key layout to '$key_layout' (...)"
+	loadkeys $key_layout; cmd_name=loadkeys
+	success_msg="[+] Your key layout ('$key_layout') is successfully set."
+	std_check
 
-echo "Setting your font to '$def_font' (...)"
-setfont $def_font; cmd_name=setfont
-success_msg="[+] Your font ('$def_font') is successfully set."
-std_check
+	echo "Setting your font to '$def_font' (...)"
+	setfont $def_font; cmd_name=setfont
+	success_msg="[+] Your font ('$def_font') is successfully set."
+	std_check
+}
+key_build
 
 
 ## Editing and running locale-gen - setting up language 
