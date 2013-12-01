@@ -74,7 +74,7 @@ std_check ()
 	fi
 }
 
-partiton_note()
+partition_note ()
 {
 	echo "Default, standard partition model: "
 	echo "	sda1 = boot (small amount of space)"
