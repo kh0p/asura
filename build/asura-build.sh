@@ -373,6 +373,7 @@ network_test_aui ()
 
 
 ## System installation
+# pacstrap, genfstab and chrooting here
 
 echo "Starting pacstrap - arch installation script (...)"
 pacstrap -i /mnt base base-devel btrfs-progs ntp; cmd_name=pacstrap; std_check

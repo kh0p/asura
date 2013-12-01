@@ -49,7 +49,9 @@ organized - to prevent from repeating oneself every single time.
 Build script is created to work with latest arch linux iso release, on 
 every architecture. For now, by default, it installs `gnome` and 
 `awesome-gnome` from official arch repositories. It'll also contain 
-few packages of recommended utilities.
+few packages of recommended utilities. I've implemented few functions 
+from AUI script for network setup and also bootloader installation 
+with configuration.
 
 
 ### License
