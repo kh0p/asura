@@ -40,8 +40,8 @@ process of assimilation to transcend space and time by redressing the
 inner balance.
 
 
-## Script for dynamic arch install
-### Description
+### Script for dynamic arch install
+#### Description
 This repo is born in wrath, and its task is to redress the inner 
 balance and regain harmony from arch install stage to setting up 
 working framework. It's automation tool to keep all procedures 
@@ -53,6 +53,10 @@ few packages of recommended utilities. I've implemented few functions
 from AUI script for network setup and also bootloader installation 
 with configuration.
 
+#### Status
+Asura dynamic install script is in testing stage. It don't have any
+structure but that issue will be fixed later - for now - making it 
+work have highest priority. 
 
 ### License
 Copyright (C) 2013 Kamil Żak (defm03/qualia) <defm03@outlook.jp>
