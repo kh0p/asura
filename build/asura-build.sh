@@ -78,7 +78,7 @@ std_check ()
 		echo $success_msg
 	else
 		$errnum=1
-		echo "[$l_green ! $default] error$errnum: command: '$cmd_name'" >> builderror.log
+		echo -e "[$l_green ! $default] error$errnum: command: '$cmd_name'" >> builderror.log
 		error_sig		
 	fi
 }
@@ -199,20 +199,20 @@ $success_msg="[$l_green + $default] Successfully set hwclock"; std_check
 echo "Running ping command on www.google.com (...)"
 ping -c 5 www.google.com
 if [ $? -ne 0 ]; then
-	echo "[$l_red ! $default] Ping on www.google.com failed."
+	echo -e "[$l_red ! $default] Ping on www.google.com failed."
 	$errnum=2
-	echo "[$l_red ! $default] error$errnum: command: 'ping'" >> builderror.log
+	echo -e "[$l_red ! $default] error$errnum: command: 'ping'" >> builderror.log
 	error_sig
 
 	echo "Re-sending ping on www.google.com (...)"
 	ping -c 5 www.google.com
 	case $? in
-		1) echo "[$l_red ! $default] PING: exit_status:1 " >> builderreor.log; $errnum=3; error_sig;;
-		2) echo "[$l_red ! $default] PING: exit status:2 " >> builderreor.log; $errnum=3; error_sig;;
+		1) echo -e "[$l_red ! $default] PING: exit_status:1 " >> builderreor.log; $errnum=3; error_sig;;
+		2) echo -e "[$l_red ! $default] PING: exit status:2 " >> builderreor.log; $errnum=3; error_sig;;
 	esac
 else
-	echo "[$l_green + $default] At least one response was heard from the specified host."
-	echo "[$l_green + $default] No problems with network connection."
+	echo -e "[$l_green + $default] At least one response was heard from the specified host."
+	echo -e "[$l_green + $default] No problems with network connection."
 fi
 
 
