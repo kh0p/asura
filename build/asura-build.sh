@@ -1,3 +1,4 @@
+#!/bin/bash
 ### Asura build script @2013
 ##
 ## Script is created to work with latest arch linux iso release [1],
@@ -39,6 +40,7 @@ errnum= #${errnum:-0}
 success_msg= #${success_msg:-"[+]"}
 cmd_name= #${cmd_name:-"noname"}
 
+MOUNTPOINT=/mnt
 mkfstype=mkfs.ext4
 dewm="gnome xorg awesome-gnome"
 key_layout=us
@@ -46,9 +48,10 @@ lang=en_US.UTF-8
 def_font=Lat2-Terminus16
 zonetime=Poland
 HOSTNAME="test"
-HOME_DIR=/mnt/home
+HOME_DIR=$MOUNTPOINT/home
 autofdisk=yes
 initramfs="-p linux"
+EDITOR=nano # for test
 
 BOOT_SIZE=+64M
 SWAP_SIZE=+1024M
@@ -105,6 +108,35 @@ partition_note ()
 	fi
 }
 
+partition_mount ()
+{
+	echo "Mounting sda3 on home directory (...)"
+	mkdir $HOME_DIR; mount $HOMEp $HOME_DIR
+	cmd_name=mount; std_check
+}
+
+fstab_config ()
+{
+	if [[ ! -f $MOUNTPOINT/etc/fstab.asura ]]; then
+		cp $MOUNTPOINT/etc/fstab $MOUNTPOINT/etc/fstab.asura
+	else
+		cp $MOUNTPOINT/etc/fstab.asura $MOUNTPOINT/etc/fstab
+	fi
+	FSTAB=("DEV" "UUID" "LABEL");
+	select OPT in "${FSTAB[@]}"; do
+		case "$REPLY" in
+			1) genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+			2) genfstab -U $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+			3) genfstab -L $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+			*) invalid_option ;;
+		esac
+		[[ -n $OPT ]] && break
+	done
+	echo "Review your fstab"
+	[[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
+	$EDITOR $MOUNTPOINT/etc/fstab
+}
+
 make_logfile ()
 {
 	echo -n "ASURA BUILD ERROR LOG " >> builderror.log
@@ -146,23 +178,48 @@ if [ "$autofdisk" == "yes" ];then
 	mkswap $SWAP; cmd_name=mkswap; std_check 
 	swapon $SWAP; cmd_name=swapon; std_check
 
-	echo "Mounting sda3 on home directory (...)"
-	mkdir $HOME_DIR; mount $HOMEp $HOME_DIR
-	cmd_name=mount; std_check
+
 else
 	echo "Running 'cfdisk' - tool to set up your partitions (...)"
 	cfdisk; cmd_name=mount; std_check
 fi
 
 
+## Network tests
+
+echo "Running ping command on www.google.com (...)"
+ping -c 5 www.google.com
+if [ $? -ne 0 ]; then
+	echo -e "[!] Ping on www.google.com failed."
+	errnum=2
+	echo -e "[!] error$errnum: command: 'ping'" >> builderror.log
+	error_sig
+
+	echo "Re-sending ping on www.google.com (...)"
+	ping -c 5 www.google.com
+	case $? in
+		1) echo -e "[!] PING: exit_status:1 " >> builderreor.log; $errnum=3; error_sig;;
+		2) echo -e "[!] PING: exit status:2 " >> builderreor.log; $errnum=3; error_sig;;
+	esac
+else
+	echo -e "[+] At least one response was heard from the specified host."
+	echo -e "[+] No problems with network connection."
+fi
+
+
 ## System installation
 
 echo "Starting pacstrap - arch installation script (...)"
-pacstrap -i /mnt base base-devel; cmd_name=pacstrap; std_check
-
+pacstrap -i /mnt base base-devel btrfs-progs ntp; cmd_name=pacstrap; std_check
+WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
+if [[ -n $WIRELESS_DEV ]]; then
+	pacstrap $MOUNTPOINT iw wireless_tools wpa_actiond wpa_supplicant dialog
+fi
 echo "Generating fstab file (...)"
-genfstab -U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/' >> /mnt/etc/fstab
-cmd_name="genfstab (-U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/')"; std_check
+#genfstab -U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/' >> /mnt/etc/fstab
+#cmd_name="genfstab (-U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/')"; std_check
+#From AIS (https://github.com/helmuthdu/aui/blob/master/ais):
+fstab_config
 
 arch-chroot /mnt; cmd_name=arch-chroot; std_check
 
@@ -204,28 +261,6 @@ echo "Changing your default zonetime info (...)"
 ln -s /usr/share/zonetime/$zonetime /etc/localetime
 hwclock --systohc --utc; cmd_name="hwclock --systohc --utc"
 success_msg="[+] Successfully set hwclock"; std_check
-
-
-## Network build up
-
-echo "Running ping command on www.google.com (...)"
-ping -c 5 www.google.com
-if [ $? -ne 0 ]; then
-	echo -e "[!] Ping on www.google.com failed."
-	errnum=2
-	echo -e "[!] error$errnum: command: 'ping'" >> builderror.log
-	error_sig
-
-	echo "Re-sending ping on www.google.com (...)"
-	ping -c 5 www.google.com
-	case $? in
-		1) echo -e "[!] PING: exit_status:1 " >> builderreor.log; $errnum=3; error_sig;;
-		2) echo -e "[!] PING: exit status:2 " >> builderreor.log; $errnum=3; error_sig;;
-	esac
-else
-	echo -e "[+] At least one response was heard from the specified host."
-	echo -e "[+] No problems with network connection."
-fi
 
 
 ## unset unneeded variables
