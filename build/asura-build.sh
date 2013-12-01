@@ -135,24 +135,24 @@ if [ "$autofdisk" == "yes" ];then
 	success_msg="[$l_green + $default] Done with saving your disk partitions table"
 	echo "Displaying your partition layout (...)"
 	cat disk.layouts
+
+	echo "Setting $BOOT and $HOMEp partition type to ext4 (...)"
+	$mkfstype $BOOT; cmd_name="mkfs.ext4/boot"
+	success_msg="[+] Successfully set $BOOT to ext4"; std_check
+	$mkfstype $HOMEp; cmd_name="mkfs.ext4/home"
+	success_msg="[+] Successfully set $HOMEp to ext4"; std_check
+
+	echo "Creating and starting swap partition (...)"
+	mkswap $SWAP; cmd_name=mkswap; std_check 
+	swapon $SWAP; cmd_name=swapon; std_check
+
+	echo "Mounting sda3 on home directory (...)"
+	mkdir $HOME_DIR; mount $HOMEp $HOME_DIR
+	cmd_name=mount; std_check
 else
-	cfdisk
+	echo "Running 'cfdisk' - tool to set up your partitions (...)"
+	cfdisk; cmd_name=mount; std_check
 fi
-
-echo "Setting partition type to ext4 (...)"
-$mkfstype $BOOT; cmd_name="mkfs.ext4/boot"
-success_msg="[+] Successfully set $BOOT to ext4"; std_check
-$mkfstype $HOMEp; cmd_name="mkfs.ext4/home"
-success_msg="[+] Successfully set $HOMEp to ext4"; std_check
-
-echo "Creating and starting swap partition (...)"
-mkswap $SWAP; cmd_name=mkswap
-success_msg=""; std_check 
-swapon $SWAP; cmd_name=swapon; std_check
-
-echo "Mounting sda3 on home directory (...)"
-mkdir $HOME_DIR; mount $HOMEp $HOME_DIR
-cmd_name=mount; std_check
 
 
 ## System installation
