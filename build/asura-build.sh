@@ -39,6 +39,7 @@ errnum= #${errnum:-0}
 success_msg= #${success_msg:-"[+]"}
 cmd_name= #${cmd_name:-"noname"}
 
+SYSDIR=build
 MOUNTPOINT=/mnt
 mkfstype=mkfs.ext4
 dewm="gnome xorg awesome-gnome"
@@ -58,7 +59,7 @@ HOME_SIZE= #rest
 
 arch_chroot() 
 { 
-    arch-chroot $MOUNTPOINT /bin/bash -c "${1}"
+    arch-chroot $MOUNTPOINT/$SYSDIR /bin/bash -c "${1}"
 }
 
 format_color ()
@@ -99,7 +100,7 @@ partition_note ()
 	echo "Default, standard partition model: "
 	echo "	sda1 = boot (small amount of space)"
 	echo "	sda2 = swap (moderate amount of space)"
-	echo "	sda3 = home (biggest partition)"
+	echo "	sda3 = root (biggest partition)"
 	echo -n "You like that model? (y/n) "; read yesno
 	if [ "$yesno" == 'y' ]; then
 		BOOT=/dev/sda1
@@ -113,14 +114,14 @@ partition_note ()
 
 partition_mount ()
 {
-	echo "Mounting sda3 on $MOUNTPOINT (...)"
-	mount $ROOT $MOUNTPOINT
+	echo "Mounting sda3 on $MOUNTPOINT/$SYSDIR (...)"
+	mount $ROOT $MOUNTPOINT/$SYSDIR
 	cmd_name=mount; std_check
 	
-	mkdir $MOUNTPOINT/swapf; mount $SWAP $MOUNTPOINT/swapf 
+	mkdir $MOUNTPOINT/$SYSDIR/swapf; mount $SWAP $MOUNTPOINT/$SYSDIR/swapf 
 	cmd_name=mount; std_check
 
-	mkdir $MOUNTPOINT/boot; mount $BOOT $MOUNTPOINT/boot
+	mkdir $MOUNTPOINT/$SYSDIR/boot; mount $BOOT $MOUNTPOINT/$SYSDIR/boot
 	cmd_name=mount; std_check
 }
 
@@ -132,22 +133,22 @@ partition_umount ()
 fstab_config ()
 {
 	if [[ ! -f $MOUNTPOINT/etc/fstab.asura ]]; then
-		cp $MOUNTPOINT/etc/fstab $MOUNTPOINT/etc/fstab.asura
+		cp $MOUNTPOINT/$SYSDIR/etc/fstab $MOUNTPOINT/$SYSDIR/etc/fstab.asura
 	else
-		cp $MOUNTPOINT/etc/fstab.asura $MOUNTPOINT/etc/fstab
+		cp $MOUNTPOINT/$SYSDIR/etc/fstab.asura $MOUNTPOINT/$SYSDIR/etc/fstab
 	fi
 	FSTAB=("DEV" "UUID" "LABEL");
 	select OPT in "${FSTAB[@]}"; do
 		case "$REPLY" in
-			1) genfstab -p $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
-			2) genfstab -U $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
-			3) genfstab -L $MOUNTPOINT >> $MOUNTPOINT/etc/fstab ;;
+			1) genfstab -p $MOUNTPOINT/$SYSDIR >> $MOUNTPOINT/$SYSDIR/etc/fstab ;;
+			2) genfstab -U $MOUNTPOINT/$SYSDIR >> $MOUNTPOINT/$SYSDIR/etc/fstab ;;
+			3) genfstab -L $MOUNTPOINT/$SYSDIR >> $MOUNTPOINT/$SYSDIR/etc/fstab ;;
 			*) invalid_option ;;
 		esac
 		[[ -n $OPT ]] && break
 	done
 	echo "Review your fstab"
-	[[ -f $MOUNTPOINT/swapfile ]] && sed -i "s/\\${MOUNTPOINT}//" $MOUNTPOINT/etc/fstab
+	[[ -f $MOUNTPOINT/$SYSDIR/swapfile ]] && sed -i "s/\\${MOUNTPOINT/$SYSDIR}//" $MOUNTPOINT/$SYSDIR/etc/fstab
 	$EDITOR $MOUNTPOINT/etc/fstab
 }
 
@@ -163,15 +164,15 @@ install_bootloader(){
 			1)
 				#make grub automatically detect others OS
 				if [[ $UEFI -eq 1 ]]; then
-					pacstrap $MOUNTPOINT grub efibootmgr
+					pacstrap $MOUNTPOINT/$SYSDIR grub efibootmgr
 				else
-					pacstrap $MOUNTPOINT grub
+					pacstrap $MOUNTPOINT/$SYSDIR grub
 				fi
-				pacstrap $MOUNTPOINT os-prober
+				pacstrap $MOUNTPOINT/$SYSDIR os-prober
 				break
 				;;
 			2)
-				pacstrap $MOUNTPOINT syslinux
+				pacstrap $MOUNTPOINT/$SYSDIR syslinux
 				break
 				;;
 			3)
@@ -202,7 +203,7 @@ bootloader_config ()
 						break
 						;;
 					2)
-						arch-chroot $MOUNTPOINT
+						arch-chroot $MOUNTPOINT/$SYSDIR
 						break
 						;;
 					*)
@@ -231,7 +232,7 @@ bootloader_config ()
 						system, e.g., with device /dev/sda1 mounted on /boot you can install Syslinux in the 
 						syslinux directory"
 						echo "[!] mkdir /boot/syslinux\nextlinux --install /boot/syslinux"
-						arch_chroot $MOUNTPOINT
+						arch_chroot $MOUNTPOINT/$SYSDIR
 						break
 						;;
 					*)
@@ -378,7 +379,7 @@ echo "Starting pacstrap - arch installation script (...)"
 pacstrap -i /mnt base base-devel btrfs-progs ntp; cmd_name=pacstrap; std_check
 WIRELESS_DEV=`ip link | grep wlp | awk '{print $2}'| sed 's/://'`
 if [[ -n $WIRELESS_DEV ]]; then
-	pacstrap $MOUNTPOINT iw wireless_tools wpa_actiond wpa_supplicant dialog
+	pacstrap $MOUNTPOINT/$SYSDIR iw wireless_tools wpa_actiond wpa_supplicant dialog
 fi
 echo "Generating fstab file (...)"
 #genfstab -U -p /mnt  :  sed 's/rw,realtime,data=ordered/defaults,realtime/' >> /mnt/etc/fstab
@@ -478,5 +479,10 @@ install_bootloader
 bootloader_config
 
 
+## umount
+
+umount {proc,sys,dev,boot,swapf}
+umount /mnt
+
 ## unset uneeded variables
-unset BOOT; unset SWAP; unset HOMEp; unset HOME_DIR; 
+unset BOOT; unset SWAP; unset ROOT; unset HOME_DIR; 
