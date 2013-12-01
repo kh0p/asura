@@ -63,7 +63,6 @@ format_color ()
 	l_green=\e[92m
 	l_red=\e[91m
 }
-format_color
 
 error_sig ()
 {
@@ -162,7 +161,7 @@ make_logfile
 partition_note
 read -p "Press any key to continue... " -n1 -s
 if [ "$autofdisk" == "yes" ];then
-	TOTAL_MEM=`grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//'`
+	TOTAL_MEM=$(grep MemTotal /proc/meminfo | awk '{print $2/1024}' | sed 's/\..*//')
 
 	(echo n; echo p; echo 1; echo ; echo $BOOT_SIZE;
 	 echo a;
@@ -339,7 +338,7 @@ unset key_layout; unset mkfstype
 ## building an initramfs CPIO image
 # mkinitcpio - is the next generation of initramfs creation. 
 # /usr/lib/modules - available kernel versions
-# mkinitcpio -g /boot/linux.img -k <version>
+# mkinitcpio -g /boot/linux.img -k [version]
 # https://wiki.archlinux.org/index.php/mkinitcpio - archwiki
 
 echo "Building an initramfs CPIO image (...)"
