@@ -61,7 +61,9 @@ work have highest priority.
 
 ### Script for dynamic gentoo install
 #### Status
-Setting basic, shared functions, and config file with 'USE' variables.
+There are few shared, common functions, script to install choosen DE,
+and configuration file `INSTALL` which will be used to run script with
+pre-defined variables - flags. Working on build script.
 
 ### License
 Copyright (C) 2013 Kamil Żak (defm03/qualia) <defm03@outlook.jp>
