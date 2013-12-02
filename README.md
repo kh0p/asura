@@ -58,6 +58,11 @@ Asura dynamic install script is in testing stage. It don't have any
 structure but that issue will be fixed later - for now - making it 
 work have highest priority. 
 
+
+### Script for dynamic gentoo install
+#### Status
+Setting basic, shared functions, and config file with 'USE' variables.
+
 ### License
 Copyright (C) 2013 Kamil Żak (defm03/qualia) <defm03@outlook.jp>
 
