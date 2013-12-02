@@ -27,6 +27,10 @@ SET_USE_FLAG ()
 		USE="$USE_OLD $flags"
 	elif [ "$file" == "package.use"]
 		eval PORTAGE_package_use
+		log_msg "Openning /etc/portage/package.use file"
+		USE_OLD="$USE"
+		log_msg "Setting new USE flags."
+		USE="$USE_OLD $flags"
 	else 
 		echo "Unknown file."
 	fi
