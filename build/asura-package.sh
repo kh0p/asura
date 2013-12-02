@@ -12,7 +12,7 @@ argsparse ()
 	while true; do
 		case $1 in
 			-S|--install-package)
-				INSTALL_PACKAGE="$2"; 
+				INSTALL_PACKAGE="$2";
 				shift; continue
 				;;
 			-h|--help)
@@ -31,18 +31,6 @@ argsparse ()
 	done
 }
 
-eselect_profile ()
-{
-	profile_name=$1
-	log_msg "Displaying your eselect profile list"
-	echo eselect profile list
-	read -p "Press any key to continue... " -n1 -s
-
-	echo eselect profile set $profile_name
-	log_msg "Setting your eselect profile"
-}
-
-
 pack_gfx()
 {
 	pack_de () {
@@ -50,16 +38,38 @@ pack_gfx()
 		{
 			log_msg "Setting gnome USE flags in make.conf"
 			SET_USE_FLAG make.conf "dbus gtk gnome"
-
 			eselect_profile "desktop"
 
-			log_msg "Running emerge on gnome"
-			echo emerge gnome
-		}
+			gnome=("gnome" "gnome-light")
+			echo -e "Install gnome:\n"
+			select GNOME in "${gnome[@]}"; do
+				case "$REPLY" in
+					1)
+						log_msg "Running emerge on gnome"
+						echo emerge gnome
+						;;
+					2)
+						log_msg "Running emerge on gnome-light"
+						echo emerge gnome-light
+						;;
+					*)
+						echo "Invalid option."
+						;;
+				esac
+			done
 
-		install_gnome_light ()
-		{
+			log_msg "Updating environment variables"
+			echo env-update && source /etc/profile
 
+			log_msg "Cleaning up the remaining services and user groups"
+			
+			log_msg "Setting up the DBUS service"
+			echo /etc/init.d/dbus start
+
+			# OPTIONAL
+			# log_msg "Checking and adding users to plugdev"
+			# getent group plugdev
+			# gpasswd -a $usrname plugdev
 		}
 	}
 }
